@@ -94,7 +94,11 @@ La API se expone bajo el prefijo `/api/`. **Todas las peticiones requieren auten
 
 ---
 
-## Configuración de Autenticación en Postman
+## Postman Collection
+
+Para facilitar la revisión y demostración del correcto funcionamiento de la API se incluye la colección de Postman.
+
+### Configuración de Autenticación en Postman
 
 Para probar `GET`, `POST`, `PATCH`, o `DELETE` desde Postman, debe incluir las cookies de sesión y el token CSRF para evitar errores `403 Forbidden`.
 
@@ -103,3 +107,5 @@ Para probar `GET`, `POST`, `PATCH`, o `DELETE` desde Postman, debe incluir las c
 | `Cookie`       | `csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>` |
 | `X-CSRFToken`  | `<VALOR_CSRF>`                                     |
 | `Content-Type` | `application/json`                                 |
+
+---

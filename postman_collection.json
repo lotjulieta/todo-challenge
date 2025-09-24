@@ -1,0 +1,388 @@
+{
+	"info": {
+		"_postman_id": "6cfef740-ccdc-4b57-86e7-c97f5921b0b6",
+		"name": "DJANGO TASKS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43465667",
+		"_collection_link": "https://julietalot.postman.co/workspace/Julietalot's-Workspace~83a1dc74-5ea4-4a1e-8d24-948180793122/collection/43465667-6cfef740-ccdc-4b57-86e7-c97f5921b0b6?action=share&source=collection_link&creator=43465667"
+	},
+	"item": [
+		{
+			"name": "Get Tasks",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks search",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/?search={{content}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "{{content}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks created_at_after",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/?created_at_after={{date_after}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					],
+					"query": [
+						{
+							"key": "created_at_after",
+							"value": "{{date_after}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks created_at_before",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/?created_at_before={{date_before}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					],
+					"query": [
+						{
+							"key": "created_at_before",
+							"value": "{{date_before}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks range",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/?created_at_after={{date_after}}&created_at_before={{date_before}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					],
+					"query": [
+						{
+							"key": "created_at_after",
+							"value": "{{date_after}}"
+						},
+						{
+							"key": "created_at_before",
+							"value": "{{date_before}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Task",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Segunda tarea creada con Postman y tokens manuales\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Task",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/{{pk}}}/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"{{pk}}}",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Completed Task",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"is_completed\": true  // o false para desmarcar\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/{{pk}}/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"{{pk}}",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Task",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "<VALOR_CSRF>",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/{{pk}}/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"{{pk}}",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "pk",
+			"value": ""
+		},
+		{
+			"key": "date_after",
+			"value": ""
+		},
+		{
+			"key": "date_before",
+			"value": ""
+		},
+		{
+			"key": "content",
+			"value": ""
+		}
+	]
+}
