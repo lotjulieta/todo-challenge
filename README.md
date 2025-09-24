@@ -1,37 +1,105 @@
-# Invera ToDo-List Challenge (Python/Django Jr-SSr)
+# Invera ToDo-List Challenge: API RESTful con Django y JS
 
-El propósito de esta prueba es conocer tu capacidad para crear una pequeña aplicación funcional en un límite de tiempo. A continuación, encontrarás las funciones, los requisitos y los puntos clave que debés tener en cuenta durante el desarrollo.
+Este proyecto cumple con los requisitos del ToDo-List Challenge de Invera, implementando una aplicación web moderna que utiliza una **API RESTful robusta** (construida con **Django REST Framework**) consumida por una interfaz de usuario minimalista y dinámica (**Single Page Application simplificada** con HTML/CSS/JavaScript).
 
-## Qué queremos que hagas:
+---
 
-- El Challenge consiste en crear una aplicación web sencilla que permita a los usuarios crear y mantener una lista de tareas.
-- La entrega del resultado será en un nuevo fork de este repo y deberás hacer una pequeña demo del funcionamiento y desarrollo del proyecto ante un super comité de las más grandes mentes maestras de Invera, o a un par de devs, lo que sea más fácil de conseguir.
-- Podes contactarnos en caso que tengas alguna consulta.
+## Características y Valor Añadido
 
-## Objetivos:
+Características y Valor Añadido
 
-El usuario de la aplicación tiene que ser capaz de:
+    Arquitectura: Separación total de Backend y Frontend. La interfaz es una SPA simple que consume la API vía AJAX/Fetch, lo que demuestra una arquitectura moderna y permite escalabilidad futura (ej., con React/Vue).
 
-- Autenticarse
-- Crear una tarea
-- Eliminar una tarea
-- Marcar tareas como completadas
-- Poder ver una lista de todas las tareas existentes
-- Filtrar/buscar tareas por fecha de creación y/o por el contenido de la misma
+    API RESTful: Implementada con Django REST Framework (DRF). Utiliza métodos HTTP estándar: GET (Listar), POST (Crear), PATCH (Actualizar/Marcar), DELETE (Eliminar).
 
-## Qué evaluamos:
+    Seguridad: Uso de SessionAuthentication y CSRF Protection (vía X-CSRFToken en peticiones AJAX) para garantizar un flujo de sesión seguro.
 
-- Desarrollo utilizando Python, Django. No es necesario crear un Front-End, pero sí es necesario tener una API que permita cumplir con los objetivos de arriba.
-- Uso de librerías y paquetes estandares que reduzcan la cantidad de código propio añadido.
-- Calidad y arquitectura de código. Facilidad de lectura y mantenimiento del código. Estándares seguidos.
-- [Bonus] Manejo de logs.
-- [Bonus] Creación de tests (unitarias y de integración)
-- [Bonus] Unificar la solución propuesta en una imagen de Docker por repositorio para poder ser ejecutada en cualquier ambiente (si aplica para full stack).
+    Filtrado Avanzado: Implementado con la librería DjangoFilterBackend para búsquedas complejas: búsqueda por contenido (title y description) y filtrado por rango de fecha (created_at_after, created_at_before).
 
-## Requerimientos de entrega:
+    Operaciones: Crear, listar, eliminar y marcar/desmarcar tareas como completadas mediante peticiones asíncronas, ofreciendo una experiencia de usuario fluida sin recargar la página.
 
-- Hacer un fork del proyecto y pushearlo en github. Puede ser privado.
-- La solución debe correr correctamente.
-- El Readme debe contener todas las instrucciones para poder levantar la aplicación, en caso de ser necesario, y explicar cómo se usa.
-- Disponibilidad para realizar una pequeña demo del proyecto al finalizar el challenge.
-- Tiempo para la entrega: Aproximadamente 7 días.
+    Manejo de Logs: Configuración de LOGGING profesional para registrar eventos importantes (creación, eliminación y cambio de estado de tareas) en consola y en archivo (`logs/django_errors.log`), mejorando la mantenibilidad del sistema.
+
+    Tests: Cobertura con Tests Unitarios (modelo) y Tests de Integración (API REST) para asegurar la funcionalidad y el alcance de usuario.
+
+---
+
+### Acceso a la Aplicación
+
+| URL                             | Función                       |
+| :------------------------------ | :---------------------------- |
+| `http://localhost:8000/`        | Página de inicio.             |
+| `http://localhost:8000/signup/` | Registro de nuevos usuarios.  |
+| `http://localhost:8000/admin/`  | Panel de Login y Admin.       |
+| `http://localhost:8000/tasks/`  | **Interfaz de Tareas (SPA).** |
+
+---
+
+## Pruebas de la API RESTful (Postman/cURL)
+
+La API se expone bajo el prefijo `/api/`. **Todas las peticiones requieren autenticación por sesión** (debe estar logueado previamente en el navegador o enviar las cookies de sesión).
+
+### Endpoints Principales
+
+1.  **Listar Tareas (GET)**
+
+    ```
+    [GET] http://localhost:8000/api/tasks/
+    ```
+
+2.  **Crear Tarea (POST)**
+
+    ```
+    [POST] http://localhost:8000/api/tasks/
+
+    --- BODY (JSON) ---
+    {
+      "title": "",
+      "description": ""
+    }
+    ```
+
+3.  **Eliminar Tarea (DELETE)**
+    _(Reemplaza `<pk>` con el ID de la tarea, ej: `/api/tasks/5/`)_
+
+    ```
+    [DELETE] http://localhost:8000/api/tasks/<pk>/
+    ```
+
+4.  **Marcar Tarea como Completada (PATCH)**
+
+    ```
+    [PATCH] http://localhost:8000/api/tasks/<pk>/
+
+    --- BODY (JSON) ---
+    {
+      "is_completed": true
+    }
+    ```
+
+### Filtrado
+
+5.  **Buscar por Contenido (GET)**
+    _(Busca en `title` y `description`)_
+
+    ```
+    [GET] http://localhost:8000/api/tasks/?search=documentacion
+    ```
+
+6.  **Filtrar por Rango de Fecha (GET)**
+    _(Tareas creadas entre las dos fechas, usa `_after` y `_before`)_
+    ```
+    [GET] http://localhost:8000/api/tasks/?created_at_after=2025-01-01&created_at_before=2025-03-30
+    ```
+
+---
+
+## Configuración de Autenticación en Postman
+
+Para probar `GET`, `POST`, `PATCH`, o `DELETE` desde Postman, debe incluir las cookies de sesión y el token CSRF para evitar errores `403 Forbidden`.
+
+| Cabecera (Key) | Valor (Value)                                      |
+| :------------- | :------------------------------------------------- |
+| `Cookie`       | `csrftoken=<VALOR_CSRF>; sessionid=<VALOR_SESION>` |
+| `X-CSRFToken`  | `<VALOR_CSRF>`                                     |
+| `Content-Type` | `application/json`                                 |

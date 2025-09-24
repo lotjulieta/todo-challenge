@@ -1,0 +1,400 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Tareas</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        width: 700px;
+        max-width: 95%;
+
+        position: relative;
+
+        border-bottom: 1px solid #eee;
+      }
+      h2 {
+        text-align: center;
+        color: #333;
+        margin-top: 10px;
+        margin-bottom: 30px;
+      }
+
+      .logout-form {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+      .logout-btn {
+        background: none;
+        border: none;
+        color: #1a73e8;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0;
+      }
+      .task-form,
+      .search-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .task-form input[type="text"] {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .task-form button,
+      .search-form button {
+        padding: 10px 15px;
+        border: none;
+        background-color: #1a73e8;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        min-width: 80px;
+      }
+      .search-form label {
+        white-space: nowrap;
+        margin-right: 5px;
+      }
+      .search-form input[type="search"],
+      .search-form input[type="date"] {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+
+        min-width: 120px;
+      }
+      .task-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+      }
+      .task-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 10px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
+        background-color: #fcfcfc;
+        border-radius: 4px;
+      }
+      .task-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+      .task-item.completed {
+        text-decoration: line-through;
+        color: #aaa;
+      }
+      .task-item span {
+        flex-grow: 1;
+        margin-right: 15px;
+      }
+      .task-actions {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .task-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: #666;
+        padding: 5px;
+      }
+      .task-actions button.complete-btn {
+        color: #28a745;
+      }
+      .task-actions button.delete-btn {
+        color: #dc3545;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+        .task-form,
+        .search-form {
+          flex-direction: column;
+          gap: 15px;
+        }
+        .task-form input[type="text"],
+        .search-form input[type="search"],
+        .search-form input[type="date"] {
+          width: 100%;
+          margin-right: 0;
+        }
+        .search-form label {
+          margin-right: 0;
+          margin-bottom: 5px;
+          display: block;
+        }
+        .task-form button,
+        .search-form button {
+          width: 100%;
+        }
+        .logout-form {
+          top: 10px;
+          right: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form action="{% url 'admin:logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Cerrar sesión</button>
+      </form>
+
+      <h2>Lista de Tareas</h2>
+      <p>Hola, {{ user.username }}!</p>
+
+      <form id="task-create-form" class="task-form">
+        <input
+          type="text"
+          id="task-title"
+          placeholder="Añade una nueva tarea..."
+          required
+        />
+        <input
+          type="text"
+          id="task-description"
+          placeholder="Descripción (opcional)..."
+        />
+        <button type="submit">Agregar</button>
+      </form>
+
+      <form id="task-filter-form" class="search-form">
+        <input
+          type="search"
+          id="search-query"
+          placeholder="Buscar por título o contenido..."
+        />
+        <label for="date-range">Rango de Fecha:</label>
+        <input type="date" id="date-from" />
+        <input type="date" id="date-to" />
+        <button type="submit">Filtrar</button>
+      </form>
+
+      <ul id="task-list" class="task-list"></ul>
+    </div>
+
+    <script>
+      // OBTENER EL TOKEN CSRF DESDE LA COOKIE PARA SEGURIDAD
+      const getCookie = (name) => {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      };
+
+      const csrftoken = getCookie("csrftoken");
+      const API_URL = "/api/tasks/";
+      const taskListContainer = document.getElementById("task-list");
+
+      const renderTask = (task) => {
+        const li = document.createElement("li");
+        li.className = `task-item ${task.is_completed ? "completed" : ""}`;
+        li.setAttribute("data-id", task.id);
+
+        const taskText = document.createElement("span");
+        taskText.innerHTML = `<strong>${task.title}</strong><br><small>${
+          task.description || "Sin descripción"
+        }</small>`;
+
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "task-actions";
+
+        const completeBtn = document.createElement("button");
+        completeBtn.type = "button";
+        completeBtn.className = "complete-btn";
+        completeBtn.title = "Marcar como completada/incompleta";
+        completeBtn.innerHTML = `<i class="fas ${
+          task.is_completed ? "fa-undo" : "fa-check-circle"
+        }"></i>`;
+        completeBtn.addEventListener("click", () =>
+          toggleTaskComplete(task.id, !task.is_completed)
+        );
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.title = "Eliminar tarea";
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.addEventListener("click", () => deleteTask(task.id));
+
+        actionsDiv.appendChild(completeBtn);
+        actionsDiv.appendChild(deleteBtn);
+        li.appendChild(taskText);
+        li.appendChild(actionsDiv);
+        return li;
+      };
+
+      const fetchTasks = async (filterParams = "") => {
+        try {
+          const response = await fetch(`${API_URL}?${filterParams}`);
+          if (!response.ok) throw new Error("Error al cargar tareas");
+
+          const tasks = await response.json();
+          taskListContainer.innerHTML = ""; // Limpia la lista actual
+
+          if (tasks.length === 0) {
+            taskListContainer.innerHTML = "<li>No hay tareas. ¡Crea una!</li>";
+          } else {
+            tasks.forEach((task) =>
+              taskListContainer.appendChild(renderTask(task))
+            );
+          }
+        } catch (error) {
+          console.error("Fetch error:", error);
+          alert("Error al conectar con la API.");
+        }
+      };
+
+      const createTask = async (title, description) => {
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({ title, description }),
+          });
+
+          if (!response.ok) throw new Error("Error al crear la tarea");
+
+          // Limpia los campos del formulario y recarga la lista
+          document.getElementById("task-title").value = "";
+          document.getElementById("task-description").value = "";
+          fetchTasks();
+        } catch (error) {
+          console.error("Create error:", error);
+          alert("Error al crear la tarea. Inténtalo de nuevo.");
+        }
+      };
+
+      const toggleTaskComplete = async (id, isCompleted) => {
+        try {
+          const response = await fetch(`${API_URL}${id}/`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({ is_completed: isCompleted }),
+          });
+
+          if (!response.ok) throw new Error("Error al actualizar la tarea");
+          fetchTasks(); // Recarga la lista para actualizar el estado
+        } catch (error) {
+          console.error("Toggle error:", error);
+          alert("Error al marcar la tarea.");
+        }
+      };
+
+      const deleteTask = async (id) => {
+        if (!confirm("¿Estás seguro de que quieres eliminar esta tarea?"))
+          return;
+
+        try {
+          const response = await fetch(`${API_URL}${id}/`, {
+            method: "DELETE",
+            headers: {
+              "X-CSRFToken": csrftoken,
+            },
+          });
+
+          if (response.status === 204) {
+            fetchTasks();
+          } else {
+            throw new Error("Error al eliminar la tarea");
+          }
+        } catch (error) {
+          console.error("Delete error:", error);
+          alert("Error al eliminar la tarea.");
+        }
+      };
+
+      document
+        .getElementById("task-create-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const title = document.getElementById("task-title").value.trim();
+          const description = document
+            .getElementById("task-description")
+            .value.trim();
+          if (title) {
+            createTask(title, description);
+          }
+        });
+
+      document
+        .getElementById("task-filter-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const search = document.getElementById("search-query").value.trim();
+          const dateFrom = document.getElementById("date-from").value;
+          const dateTo = document.getElementById("date-to").value;
+
+          const params = new URLSearchParams();
+
+          if (search) {
+            params.append("search", search);
+          }
+
+          if (dateFrom) {
+            params.append("created_at_after", dateFrom);
+          }
+          if (dateTo) {
+            params.append("created_at_before", dateTo);
+          }
+
+          fetchTasks(params.toString());
+        });
+
+      document.addEventListener("DOMContentLoaded", () => fetchTasks());
+    </script>
+  </body>
+</html>
